@@ -1,4 +1,4 @@
-# Bulk RNAseq analysis of GEO GSE292807
+# Bulk RNAseq analysis of GEO GSE205459
 
 All code is done in R
 
