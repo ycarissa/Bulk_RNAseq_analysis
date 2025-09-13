@@ -49,7 +49,7 @@ ggsave(filename = file.path(save_dir, "PCA.png"), plot = pca,
 de_dir <- file.path(save_dir, "Differential_Expression")
 dir.create(de_dir)
 
-res <- results(dds)
+res <- results(dds, contrast = c("condition", "KO", "WT"))
 write.csv(res, file = file.path(de_dir, "DE_results.csv"), row.names = TRUE)
 
 v1 <- EnhancedVolcano(res,
@@ -63,9 +63,9 @@ v1 <- EnhancedVolcano(res,
 ggsave(filename = file.path(de_dir, "Volcano_plot.png"), 
        plot = v1, width = 8, height = 6, dpi=600)
 
-
-sig_genes_list <- rownames(res[abs(na.omit(res)$log2FoldChange) > 1 & 
-                                 na.omit(res)$padj < 0.05, ])
+res_clean <- res[!is.na(res$log2FoldChange) & !is.na(res$padj), ]
+sig_genes_list <- rownames(res_clean[abs(res_clean$log2FoldChange) > 1 & 
+                                       res_clean$padj < 0.05, ])
 
 mat <- counts(dds, normalized=T)
 mat <- mat[sig_genes_list, , drop=F]
@@ -83,8 +83,8 @@ Heatmap(mat.z,
 pe_dir <- file.path(save_dir, "Pathway_enrichment")
 dir.create(pe_dir)
 
-sig_genes <- res[abs(na.omit(res)$log2FoldChange) > 0.35 & 
-                   na.omit(res)$padj < 0.05, ]
+sig_genes <- res_clean[abs(res_clean$log2FoldChange) > 0.35 & 
+                         res_clean$padj < 0.05, ]
 
 sig_genes$entrez_id <- mapIds(org.Mm.eg.db,
                               keys = rownames(sig_genes),
