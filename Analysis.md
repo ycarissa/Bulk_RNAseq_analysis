@@ -65,7 +65,7 @@ pca <- ggplot(pcaData, aes(PC1, PC2, color = condition)) +
   ggtitle("PCA of samples")
 ```
 
-![](rmarkdown_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](Analysis_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 # Differential Expression Analysis
 
@@ -90,7 +90,7 @@ v1 <- EnhancedVolcano(res,
                       subtitle = "WDR6-WKO vs WT")
 ```
 
-![](rmarkdown_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](Analysis_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 Heatmap of DGEs with the same cut off:
 
@@ -111,7 +111,7 @@ Heatmap(mat.z,
         row_names_gp = gpar(fontsize = 8))
 ```
 
-![](rmarkdown_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](Analysis_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 # Pathway Enrichment
 
@@ -142,22 +142,22 @@ run_go <- function(gene_list) {
   for (ont in onts) {
     #Total
     ego <- enrichGO(gene = gene_list$entrez_id,
-           OrgDb = org.Mm.eg.db,
-           keyType = "ENTREZID",
-           ont = ont,
-           pAdjustMethod = "BH",
-           pvalueCutoff = 0.05,
-           qvalueCutoff = 0.2,
-           readable = TRUE)
-  
+                    OrgDb = org.Mm.eg.db,
+                    keyType = "ENTREZID",
+                    ont = ont,
+                    pAdjustMethod = "BH",
+                    pvalueCutoff = 0.05,
+                    qvalueCutoff = 0.2,
+                    readable = TRUE)
+    
     if (!is.null(ego) && nrow(ego@result) > 0) {
-  
-    d1 <- dotplot(ego, showCategory=10) + ggtitle(paste("Total GO Enrichment -", ont))
+      
+      d1 <- dotplot(ego, showCategory=10) + ggtitle(paste("Total GO Enrichment -", ont))
     }
-  
+    
     genes_up <- gene_list$entrez_id[gene_list$log2FoldChange > 0]
     genes_down <- gene_list$entrez_id[gene_list$log2FoldChange < 0]
-  
+    
     #Up 
     up <- enrichGO(gene = genes_up,
                    OrgDb = org.Mm.eg.db,
@@ -169,9 +169,9 @@ run_go <- function(gene_list) {
                    readable = TRUE)
     
     if (!is.null(up) && nrow(up@result) > 0) {
-    d2 <- dotplot(up, showCategory=10) + ggtitle(paste("Upregulated GO Enrichment -", ont))
+      d2 <- dotplot(up, showCategory=10) + ggtitle(paste("Upregulated GO Enrichment -", ont))
     }
-  
+    
     #Down
     down <- enrichGO(gene = genes_down,
                      OrgDb = org.Mm.eg.db,
@@ -181,9 +181,9 @@ run_go <- function(gene_list) {
                      pvalueCutoff = 0.05,
                      qvalueCutoff = 0.2,
                      readable = TRUE)
-  
+    
     if (!is.null(down) && nrow(down@result) > 0) {
-    d3 <- dotplot(down, showCategory=10) + ggtitle(paste("Downregulated GO Enrichment -", ont))
+      d3 <- dotplot(down, showCategory=10) + ggtitle(paste("Downregulated GO Enrichment -", ont))
     }
   }
 }
@@ -256,7 +256,7 @@ run_kegg <- function(gene_list) {
 
 Example output:
 
-![](rmarkdown_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](Analysis_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
     ##                    ID                                         Description
     ## GO:0051607 GO:0051607                           defense response to virus
@@ -303,11 +303,11 @@ KEGG is similar, but there’s option for different ontologies:
 run_kegg <- function(gene_list) {
   #Total
   kegg <- enrichKEGG(gene = gene_list$entrez_id,
-                           organism = 'mmu',            
-                           keyType = "kegg",           
-                           pAdjustMethod= "BH",
-                           pvalueCutoff = 0.05,
-                           qvalueCutoff = 0.2)
+                     organism = 'mmu',            
+                     keyType = "kegg",           
+                     pAdjustMethod= "BH",
+                     pvalueCutoff = 0.05,
+                     qvalueCutoff = 0.2)
   
   if (!is.null(kegg) && nrow(kegg@result) > 0) {
     d1 <- dotplot(kegg, showCategory = 10) + ggtitle("Total KEGG Enrichment")
@@ -318,31 +318,31 @@ run_kegg <- function(gene_list) {
   
   #Up
   kegg_up <- enrichKEGG(gene = genes_up,
+                        organism = 'mmu',
+                        keyType = "kegg",
+                        pAdjustMethod = "BH",
+                        pvalueCutoff = 0.05,
+                        qvalueCutoff = 0.2)
+  if (!is.null(kegg_up) && nrow(kegg_up@result) > 0) {
+    d2 <- dotplot(kegg_up, showCategory = 10) + ggtitle("Upregulated KEGG Enrichment")
+  }
+  
+  
+  #Down
+  kegg_down <- enrichKEGG(gene = genes_down,
                           organism = 'mmu',
                           keyType = "kegg",
                           pAdjustMethod = "BH",
                           pvalueCutoff = 0.05,
                           qvalueCutoff = 0.2)
-  if (!is.null(kegg_up) && nrow(kegg_up@result) > 0) {
-    d2 <- dotplot(kegg_up, showCategory = 10) + ggtitle("Upregulated KEGG Enrichment")
-    }
-  
-  
-  #Down
-    kegg_down <- enrichKEGG(gene = genes_down,
-                            organism = 'mmu',
-                            keyType = "kegg",
-                            pAdjustMethod = "BH",
-                            pvalueCutoff = 0.05,
-                            qvalueCutoff = 0.2)
-    if (!is.null(kegg_down) && nrow(kegg_down@result) > 0) {
-      d3 <- dotplot(kegg_down, showCategory = 10) + ggtitle("Downregulated KEGG Enrichment")
-    }
+  if (!is.null(kegg_down) && nrow(kegg_down@result) > 0) {
+    d3 <- dotplot(kegg_down, showCategory = 10) + ggtitle("Downregulated KEGG Enrichment")
+  }
   
 }
 ```
 
-![](rmarkdown_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](Analysis_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
     ##                                      category
     ## mmu05171                       Human Diseases
